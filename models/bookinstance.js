@@ -15,7 +15,6 @@ const BookInstanceSchema = new Schema({
   due_back: { type: Date, default: Date.now },
 });
 
-// Virtual for bookinstance's URL
 BookInstanceSchema.virtual('due_back_formatted').get(function () {
   return DateTime.fromJSDate(this.due_back).toLocaleString(DateTime.DATE_MED);
 });
