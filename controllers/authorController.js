@@ -4,11 +4,25 @@ const Book = require('../models/book');
 
 // Display list of all Authors.
 exports.author_list = asyncHandler(async (req, res, next) => {
-  const allAuthors = await Author.find().sort({ family_name: 1 }).exec();
-  res.render('author_list', {
-    title: 'Author List',
-    author_list: allAuthors,
-  });
+  try {
+    // Retrieve all authors
+    const allAuthors = await Author.find().sort({ family_name: 1 }).exec();
+
+    // Log the data for each author
+    allAuthors.forEach((author) => {
+      console.log(`Author: ${author.name}, Date of Birth: ${author.date_of_birth}, Date of Death: ${author.date_of_death}`);
+    });
+
+    // Render the view with the author list
+    res.render('author_list', {
+      title: 'Author List',
+      author_list: allAuthors,
+    });
+  } catch (err) {
+    // Handle any errors
+    console.error('Error fetching author list:', err);
+    next(err);
+  }
 });
 
 // Display detail page for a specific Author.
