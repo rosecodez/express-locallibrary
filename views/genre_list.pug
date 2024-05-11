@@ -8,6 +8,6 @@ block content
       each genre in genre_list
         li
           a(href=genre.url) #{genre.name}
-          |  (#{genre_formatted} - #{ne_formatted})
+          |  (#{genre_formatted} - #{genre_formatted})
   else
     p There are no authors.
