@@ -117,7 +117,7 @@ exports.author_delete_get = asyncHandler(async (req, res, next) => {
     Author.findById(req.params.id).exec(),
     Book.find({ author: req.params.id }, 'title summary').exec(),
   ]);
-
+  // if there is no author in the database return to page
   if (author === null) {
     // No results.
     res.redirect('/catalog/authors');
