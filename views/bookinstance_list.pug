@@ -7,16 +7,17 @@ block content
     ul
       each val in bookinstance_list
         li
-          a(href=val.url) #{val.book.title} : #{val.imprint} -&nbsp;
-          if val.status=='Available'
-            span.text-success #{val.status}
-          else if val.status=='Maintenance'
-            span.text-danger #{val.status}
-          else
-            span.text-warning #{val.status}
-          if val.status != 'Available'
-            //span  (Due: #{val.due_back} )
-            span  (Due: #{val.due_back_formatted} )
+          a(href=val.url)
+            | #{val.book ? val.book.title : 'Unknown Title'} : #{val.imprint} -
+            if val.status === 'Available'
+              span.text-success #{val.status}
+            else if val.status === 'Maintenance'
+              span.text-danger #{val.status}
+            else
+              span.text-warning #{val.status}
+
+            if val.status !== 'Available'
+              span (Due: #{val.due_back_formatted})
 
   else
     p There are no book copies in this library.

@@ -4,14 +4,28 @@ const BookInstance = require('../models/bookinstance');
 const Book = require('../models/book');
 
 // Display list of all BookInstances.
-exports.bookinstance_list = asyncHandler(async (req, res, next) => {
-  const allBookInstances = await BookInstance.find().populate('book').exec();
+exports.bookinstance_list = async (req, res, next) => {
+  try {
+    const bookinstance_list = await BookInstance.find({})
+      .populate('book') // Make sure to populate the book field
+      .exec();
 
-  res.render('bookinstance_list', {
-    title: 'Book Instance List',
-    bookinstance_list: allBookInstances,
-  });
-});
+    if (bookinstance_list.length === 0) {
+      res.render('bookinstance_list', {
+        title: 'Book Copies',
+        bookinstance_list: [],
+      });
+      return;
+    }
+
+    res.render('bookinstance_list', {
+      title: 'Book Copies',
+      bookinstance_list,
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
 
 // Display detail page for a specific BookInstance.
 exports.bookinstance_detail = asyncHandler(async (req, res, next) => {
