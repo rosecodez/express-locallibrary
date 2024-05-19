@@ -154,10 +154,62 @@ exports.author_delete_post = asyncHandler(async (req, res, next) => {
 
 // Display Author update form on GET.
 exports.author_update_get = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: Author update GET');
+  // Get details of author and all associated books (in parallel)
+  const [author, booksByAuthor] = await Promise.all([
+    Author.findById(req.params.id).exec(),
+    Book.find({ author: req.params.id }).exec(),
+  ]);
+
+  if (author === null) {
+    // No results.
+    const err = new Error('Author not found');
+    err.status = 404;
+    return next(err);
+  }
+
+  res.render('author_form', {
+    title: 'Update Author',
+    author,
+    author_books: booksByAuthor,
+  });
 });
 
 // Handle Author update on POST.
-exports.author_update_post = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: Author update POST');
-});
+exports.author_update_post = [
+  // Validate and sanitize fields.
+  body('first_name', 'First name must not be empty.').trim().isLength({ min: 1 }).escape(),
+  body('family_name', 'Family name must not be empty.').trim().isLength({ min: 1 }).escape(),
+  body('date_of_birth', 'Invalid date of birth').optional({ checkFalsy: true }).isISO8601().toDate(),
+  body('date_of_death', 'Invalid date of death').optional({ checkFalsy: true }).isISO8601().toDate(),
+
+  // Process request after validation and sanitization.
+  asyncHandler(async (req, res, next) => {
+    // Extract the validation errors from a request.
+    const errors = validationResult(req);
+
+    // Create Author object with escaped and trimmed data (and the old id!)
+    const author = new Author({
+      _id: req.params.id, // This is required, or a new ID will be assigned!
+      first_name: req.body.first_name,
+      family_name: req.body.family_name,
+      date_of_birth: req.body.date_of_birth,
+      date_of_death: req.body.date_of_death,
+    });
+
+    if (!errors.isEmpty()) {
+      // There are errors. Render the form again with sanitized values/error messages.
+      const author_books = await Book.find({ author: req.params.id }).exec();
+      res.render('author_form', {
+        title: 'Update Author',
+        author,
+        author_books,
+        errors: errors.array(),
+      });
+    } else {
+      // Data from form is valid. Update the record.
+      await Author.findByIdAndUpdate(req.params.id, author);
+      // Redirect to author detail page.
+      res.redirect(author.url);
+    }
+  }),
+];
