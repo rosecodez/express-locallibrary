@@ -162,6 +162,7 @@ exports.author_update_get = asyncHandler(async (req, res, next) => {
 
   if (author === null) {
     // No results.
+    debug(`id not found on update: ${req.params.id}`);
     const err = new Error('Author not found');
     err.status = 404;
     return next(err);
