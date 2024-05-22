@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const { DateTime } = require('luxon');
+const mongoose = require("mongoose");
+const { DateTime } = require("luxon");
 
 const { Schema } = mongoose;
 
@@ -11,10 +11,10 @@ const AuthorSchema = new Schema({
 });
 
 // Virtual for author's full name
-AuthorSchema.virtual('name').get(function () {
+AuthorSchema.virtual("name").get(function () {
   // To avoid errors in cases where an author does not have either a family name or first name
   // We want to make sure we handle the exception by returning an empty string for that case
-  let fullname = '';
+  let fullname = "";
   if (this.first_name && this.family_name) {
     fullname = `${this.family_name}, ${this.first_name}`;
   }
@@ -22,13 +22,17 @@ AuthorSchema.virtual('name').get(function () {
   return fullname;
 });
 // Virtual for author's URL
-AuthorSchema.virtual('url').get(function () {
+AuthorSchema.virtual("url").get(function () {
   return `/catalog/author/${this._id}`;
 });
 
-AuthorSchema.virtual('lifespan').get(function () {
-  const birth = this.date_of_birth ? DateTime.fromJSDate(this.date_of_birth).toLocaleString(DateTime.DATE_MED) : '';
-  const death = this.date_of_death ? DateTime.fromJSDate(this.date_of_death).toLocaleString(DateTime.DATE_MED) : '';
+AuthorSchema.virtual("lifespan").get(function () {
+  const birth = this.date_of_birth
+    ? DateTime.fromJSDate(this.date_of_birth).toLocaleString(DateTime.DATE_MED)
+    : "";
+  const death = this.date_of_death
+    ? DateTime.fromJSDate(this.date_of_death).toLocaleString(DateTime.DATE_MED)
+    : "";
 
   if (birth && death) {
     return `${birth} - ${death}`;
@@ -37,8 +41,8 @@ AuthorSchema.virtual('lifespan').get(function () {
     return `${birth} - `;
   }
 
-  return 'Unknown';
+  return "Unknown";
 });
 
 // Export model
-module.exports = mongoose.model('Author', AuthorSchema);
+module.exports = mongoose.model("Author", AuthorSchema);
